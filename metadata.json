@@ -1,0 +1,5 @@
+{
+  "name": "VibeGen Architect",
+  "description": "A specialized prompt generator for text-to-video AI models. It fuses core topics with cinematic 'vibestacks' to create production-ready prompts for Sora, Runway, and Pika.",
+  "requestFramePermissions": []
+}
