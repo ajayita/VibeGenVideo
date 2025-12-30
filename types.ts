@@ -14,6 +14,7 @@ export interface HistoryItem {
   topic: string;
   vibestack: string;
   duration?: string;
+  modelId?: string;
   generatedPrompt: string;
   timestamp: number;
 }
@@ -30,6 +31,14 @@ export interface PresetVibe {
   name: string;
   description: string;
   value: string;
+}
+
+export interface ModelOption {
+  id: string;
+  name: string;
+  description: string;
+  pricing: string;
+  isNew?: boolean;
 }
 
 export const DURATION_OPTIONS = ['5s', '8s', '10s', '15s'];

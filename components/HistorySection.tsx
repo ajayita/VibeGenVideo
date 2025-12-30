@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { HistoryItem } from '../types';
-import { Clock, ChevronDown, ChevronUp, Copy, Check, RotateCcw, FileText, Sparkles, AlignLeft, Timer } from 'lucide-react';
+import { Clock, ChevronDown, ChevronUp, Copy, Check, RotateCcw, FileText, Sparkles, AlignLeft, Timer, Cpu } from 'lucide-react';
+import { AVAILABLE_MODELS } from '../assets/models';
 
 interface HistorySectionProps {
   history: HistoryItem[];
@@ -20,6 +21,12 @@ const HistoryCard = ({ item, onRestore }: { item: HistoryItem, onRestore: (item:
 
   const formatTime = (ms: number) => {
     return new Date(ms).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  };
+
+  const getModelName = (id?: string) => {
+    if (!id) return 'Unknown Model';
+    const model = AVAILABLE_MODELS.find(m => m.id === id);
+    return model ? model.name : id;
   };
 
   const wordCount = item.generatedPrompt.split(/\s+/).filter(w => w.length > 0).length;
@@ -63,7 +70,7 @@ const HistoryCard = ({ item, onRestore }: { item: HistoryItem, onRestore: (item:
           <div className="p-5 bg-zinc-50/50 dark:bg-black/20">
             
             {/* Metadata Row */}
-            <div className="flex items-center gap-6 mb-5 pb-5 border-b border-zinc-200 dark:border-zinc-800/50">
+            <div className="flex flex-wrap items-center gap-6 mb-5 pb-5 border-b border-zinc-200 dark:border-zinc-800/50">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-cine-accent shadow-sm">
                    <Timer className="w-4 h-4" />
@@ -71,6 +78,16 @@ const HistoryCard = ({ item, onRestore }: { item: HistoryItem, onRestore: (item:
                 <div>
                    <p className="text-[10px] uppercase tracking-wider font-bold text-zinc-400 mb-0.5">Duration</p>
                    <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{item.duration || '8s'}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-cine-accent shadow-sm">
+                   <Cpu className="w-4 h-4" />
+                </div>
+                <div>
+                   <p className="text-[10px] uppercase tracking-wider font-bold text-zinc-400 mb-0.5">Model</p>
+                   <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{getModelName(item.modelId)}</p>
                 </div>
               </div>
             </div>
@@ -102,22 +119,6 @@ const HistoryCard = ({ item, onRestore }: { item: HistoryItem, onRestore: (item:
           <div className="p-5 pt-2">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Generated Prompt</span>
-              <button
-                onClick={handleCopy}
-                className="flex items-center gap-1.5 text-xs font-medium text-cine-accent hover:text-cine-accent-hover transition-colors px-2 py-1 rounded hover:bg-cine-accent/10"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3 h-3" />
-                    Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3 h-3" />
-                    Copy
-                  </>
-                )}
-              </button>
             </div>
             
             <div className="relative group">
@@ -127,7 +128,15 @@ const HistoryCard = ({ item, onRestore }: { item: HistoryItem, onRestore: (item:
             </div>
 
             {/* Footer Actions */}
-            <div className="flex justify-end mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800/50">
+            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800/50">
+              <button
+                onClick={handleCopy}
+                className="flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors px-4 py-2 rounded-lg shadow-sm"
+              >
+                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                {copied ? "Copied" : "Copy Prompt"}
+              </button>
+
               <button
                 onClick={(e) => {
                   e.stopPropagation();

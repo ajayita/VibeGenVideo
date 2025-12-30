@@ -1,19 +1,27 @@
 import { GoogleGenAI } from "@google/genai";
 import { MASTER_PROMPT_TEMPLATE } from "../assets/hidden_prompt_template";
 
-// Initialize the client. API_KEY is expected to be in the environment.
-// Using a factory pattern or direct check to ensure key exists before call.
-const getClient = () => {
-  const apiKey = process.env.API_KEY;
+// Initialize the client. 
+// Priority: Custom Key (from UI) -> Environment Variable
+const getClient = (customApiKey?: string) => {
+  const apiKey = customApiKey?.trim() || process.env.API_KEY;
+  
   if (!apiKey) {
-    throw new Error("API Key not found. Please ensure process.env.API_KEY is set.");
+    throw new Error("API Key is missing. Please provide a custom key in Settings or ensure the environment is configured.");
   }
+  
   return new GoogleGenAI({ apiKey });
 };
 
-export const generateVideoPrompt = async (topic: string, vibestack: string, duration: string): Promise<string> => {
+export const generateVideoPrompt = async (
+  topic: string, 
+  vibestack: string, 
+  duration: string, 
+  modelId: string,
+  customApiKey?: string
+): Promise<string> => {
   try {
-    const ai = getClient();
+    const ai = getClient(customApiKey);
     
     // Inject user inputs into the master template
     const finalSystemPrompt = MASTER_PROMPT_TEMPLATE
@@ -21,11 +29,11 @@ export const generateVideoPrompt = async (topic: string, vibestack: string, dura
       .replace('{{VIBESTACK}}', vibestack)
       .replace('{{DURATION}}', duration);
 
+    // We allow the model to use its default thinking behavior.
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: modelId,
       contents: finalSystemPrompt,
       config: {
-        thinkingConfig: { thinkingBudget: 0 }, // Disable thinking for faster generation
         temperature: 0.7, // Slightly creative but grounded
       }
     });
